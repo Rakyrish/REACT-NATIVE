@@ -1,10 +1,13 @@
-
 import React from 'react';
 import { NavigationContainer, TabActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Registration from './Screens/Registration';
 import DetailScreen from './Screens/DetaileScreen';
-import StartScreen from  './Screens/index';
+import StartScreen from  './Screens/StartScreen';
+
+
+
+
 
 const Stack = createStackNavigator();
 

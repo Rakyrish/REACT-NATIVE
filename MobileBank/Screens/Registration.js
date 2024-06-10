@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 
 export default function Registration({navigation}) {
@@ -12,15 +12,6 @@ export default function Registration({navigation}) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-useEffect(() => {
-  if (showSuccess) {
-    const timer = setTimeout(() => {
-      navigation.navigate('DetailScreen');
-    }, 3000);
-    return () => clearTimeout(timer);
-  }
-}, [showSuccess, navigation]);
 
   const handleVerify = () => {
     let newErrors = {};
@@ -174,7 +165,11 @@ useEffect(() => {
         <View style={styles.modalContainer}>
           <View style={styles.successContainer}>
             <Text style={styles.successText}>Registration Successful!</Text>
-          
+            
+            <TouchableOpacity style={styles.button} 
+            onPress={() =>{ setShowSuccess(false); navigation.navigate('DetailScreen')} }>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

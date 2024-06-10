@@ -21,7 +21,6 @@ export default function App() {
         <Stack.Screen name='MoreOnTech' component={MoreOnTech} options={{ title: "Enjoy our sales, best in  EastAfrica" }} />
       </Stack.Navigator>
     </NavigationContainer>
-   
     </View>
   );
 }

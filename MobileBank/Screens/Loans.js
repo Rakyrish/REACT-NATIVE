@@ -12,7 +12,7 @@ const PermissionItem = ({ icon, title, description }) => (
   </View>
 );
 
-export default function Saving() {
+export default function Loan() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Please enable these permissions on your phone.</Text>

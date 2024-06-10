@@ -139,7 +139,7 @@ const handleBuyingAirtime = () => {
             <Text style={styles.accountTitle}>Savings</Text>
             {!balanceHidden ? <Text style={styles.balanceText}>Ksh 0</Text> : <Text style={styles.balanceText}>****</Text>}
             <TouchableOpacity style={styles.addButton}>
-              <Text style={styles.accountButtonText}>Savings</Text>
+              <Text style={styles.accountButtonText}>Add Savings</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.account}>
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: "orange",
     paddingVertical: 10,
-    paddingHorizontal: 25,
+    paddingHorizontal: 40,
     borderRadius: 10,
   },
   addButtonText: {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   accountButton: {
     backgroundColor: "orange",
     paddingVertical: 10,
-    paddingHorizontal: 25,
+    paddingHorizontal: 30,
     borderRadius: 10,
   },
   accountButtonText: {
