@@ -12,15 +12,17 @@ export default function Registration({navigation}) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-useEffect(() => {
-  if (showSuccess) {
-    const timer = setTimeout(() => {
-      navigation.navigate('DetailScreen');
-    }, 3000);
+  useEffect(() => {
+    let timer;
+    if (showSuccess) {
+      timer = setTimeout(() => {
+        navigation.navigate('DetailScreen');
+        setShowSuccess(false); 
+      }, 3000);
+    }
     return () => clearTimeout(timer);
-  }
-}, [showSuccess, navigation]);
+  }, [showSuccess, navigation]);
+  
 
   const handleVerify = () => {
     let newErrors = {};

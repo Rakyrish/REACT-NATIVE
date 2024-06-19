@@ -1,14 +1,14 @@
 import React from "react";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Loan from "./Loans";
-import Home from "./Home";
 
-import Saving from "./Saving";
-import Rewards from "./Rewards";
+import Home from "./Sub Screen/Home";
+import Loan from "./Sub Screen/Loans";
+import Saving from "./Sub Screen/Saving";
+import Rewards from "./Sub Screen/Rewards";
 
 import { registerRootComponent } from 'expo';
-import Transfer from './Transfer';
+import Transfer from './Sub Screen/Transfer';
 
 registerRootComponent(() => <Transfer />);
 
