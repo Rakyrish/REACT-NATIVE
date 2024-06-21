@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, Button } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
 
-export default function Registration({navigation}) {
+export default function App({ navigation }) {
   const [showPrompt, setShowPrompt] = useState(true);
   const [errors, setErrors] = useState({});
   const [phoneNumber, setPhoneNumber] = useState("+254");
@@ -10,19 +11,66 @@ export default function Registration({navigation}) {
   const [idNo, setIdNo] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    checkDeviceForHardware();
+  }, []);
+
   useEffect(() => {
     let timer;
     if (showSuccess) {
       timer = setTimeout(() => {
         navigation.navigate('DetailScreen');
-        setShowSuccess(false); 
+        setShowSuccess(false);
       }, 3000);
     }
     return () => clearTimeout(timer);
   }, [showSuccess, navigation]);
-  
+
+  const checkDeviceForHardware = async () => {
+    try {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      if (!compatible) {
+        Alert.alert('Error', 'This device is not compatible with biometric authentication.');
+        setLoading(false);
+        return;
+      }
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!enrolled) {
+        Alert.alert('Error', 'No biometric authentication methods are enrolled.');
+        setLoading(false);
+        return;
+      }
+      authenticate();
+    } catch (error) {
+      console.error('Error checking for hardware or enrollment:', error);
+      setLoading(false);
+    }
+  };
+
+  const authenticate = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Authenticate',
+        fallbackLabel: 'Use Passcode',
+        disableDeviceFallback: false,
+      });
+      if (result.success) {
+        setIsAuthenticated(true);
+        setShowPrompt(true); 
+      } else {
+        Alert.alert('Authentication failed', 'Please try again.');
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      Alert.alert('Authentication error', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleVerify = () => {
     let newErrors = {};
@@ -65,14 +113,14 @@ export default function Registration({navigation}) {
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRegistrationInput = () => {
     setLoading(true);
-    if (!validateForm()) {
+    if (validateForm()) {
       setTimeout(() => {
         setLoading(false);
         setFullNames('');
@@ -86,6 +134,25 @@ export default function Registration({navigation}) {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        
+      </View>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Authentication required</Text>
+        <Button title="Retry" onPress={authenticate} />
+      </View>
+    );
+  }
+  else{
 
   return (
     <View style={styles.container}>
@@ -157,7 +224,7 @@ export default function Registration({navigation}) {
             secureTextEntry
           />
           {errors.confirmPassword && <Text style={styles.textError}>{errors.confirmPassword}</Text>}
-          
+
           {loading ? (
             <ActivityIndicator size="large" color="orange" />
           ) : (
@@ -176,14 +243,13 @@ export default function Registration({navigation}) {
         <View style={styles.modalContainer}>
           <View style={styles.successContainer}>
             <Text style={styles.successText}>Registration Successful!</Text>
-          
           </View>
         </View>
       </Modal>
     </View>
   );
 }
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -220,7 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
     elevation: 5,
-    width: 100
+    width: 100,
   },
   buttonText: {
     textAlign: 'center',
@@ -273,6 +339,11 @@ const styles = StyleSheet.create({
   },
   textError: {
     color: 'red',
+    textAlign: 'center',
+  },
+  text: {
+    fontSize: 18,
+    margin: 20,
     textAlign: 'center',
   },
 });

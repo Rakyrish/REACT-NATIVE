@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, TextInput, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function Home() {
+export default function Home({navigation}) {
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [balance, setBalanceMoney] = useState(0);
   const [addedAmount, setAddedMoney] = useState('');
@@ -10,6 +10,12 @@ export default function Home() {
   const [airtimeIsModalVisible, setAirtimeModal] = useState(false)
   const [airtime, setAirtime] = useState('')
 
+  const toggleLoan = () => {
+    navigation.navigate('Loan')
+  }
+  const toggleSaving = () => {
+    navigation.navigate('Saving')
+  }
   const toggleBalanceVisibilty = () => {
     setBalanceHidden(!balanceHidden);
   };
@@ -138,14 +144,14 @@ const handleBuyingAirtime = () => {
           <View style={styles.account}>
             <Text style={styles.accountTitle}>Savings</Text>
             {!balanceHidden ? <Text style={styles.balanceText}>Ksh 0</Text> : <Text style={styles.balanceText}>****</Text>}
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity style={styles.addButton} onPress={toggleSaving}>
               <Text style={styles.accountButtonText}>Savings</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.account}>
             <Text style={styles.accountTitle}>Loan</Text>
             {!balanceHidden ? <Text style={styles.balanceText}>Ksh 0</Text> : <Text style={styles.balanceText}>****</Text>}
-            <TouchableOpacity style={styles.accountButton}>
+            <TouchableOpacity style={styles.accountButton} onPress={toggleLoan}>
               <Text style={styles.accountButtonText}>Apply Now</Text>
             </TouchableOpacity>
           </View>
