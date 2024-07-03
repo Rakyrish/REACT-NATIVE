@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FundMoneyApp",
-    "slug": "FundMoneyApp",
+    "name": "FundMoney",
+    "slug": "FundMoney",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,20 +11,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow Johnny Johnny App use your location."
-        }
-      ],
-      [
-        "expo-contacts",
-        {
-          "contactsPermission": "Allow Johnny Johnny App  to access your contacts."
-        }
-      ]
-    ],
     "ios": {
       "supportsTablet": true
     },

@@ -63,6 +63,8 @@ export default function App({ navigation }) {
         setShowPrompt(true); 
       } else {
         Alert.alert('Authentication failed', 'Please try again.');
+        setIsAuthenticated(true);
+        setShowPrompt(true); 
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -120,7 +122,7 @@ export default function App({ navigation }) {
 
   const handleRegistrationInput = () => {
     setLoading(true);
-    if (validateForm()) {
+    if (!validateForm()) {
       setTimeout(() => {
         setLoading(false);
         setFullNames('');
