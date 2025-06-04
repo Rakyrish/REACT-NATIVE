@@ -3,10 +3,9 @@ import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Modal, 
 import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function App({ navigation }) {
-  const [showPrompt, setShowPrompt] = useState(true);
   const [errors, setErrors] = useState({});
-  const [phoneNumber, setPhoneNumber] = useState("+254");
-  const [fullNames, setFullNames] = useState('');
+  const [phonenumber, setphonenumber] = useState("");
+  const [username, setusername] = useState('');
   const [email, setEmail] = useState('');
   const [idNo, setIdNo] = useState('');
   const [password, setPassword] = useState('');
@@ -60,11 +59,9 @@ export default function App({ navigation }) {
       });
       if (result.success) {
         setIsAuthenticated(true);
-        setShowPrompt(true); 
       } else {
         Alert.alert('Authentication failed', 'Please try again.');
         setIsAuthenticated(true);
-        setShowPrompt(true); 
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -74,41 +71,23 @@ export default function App({ navigation }) {
     }
   };
 
-  const handleVerify = () => {
-    let newErrors = {};
-    if (phoneNumber.length < 13) {
-      newErrors.phoneNumber = 'Invalid number';
-    } else {
-      setShowPrompt(false);
-    }
-    setErrors(newErrors);
-  };
-
-  const handlePhoneNumberChange = (text) => {
-    if (!text.startsWith("+254")) {
-      setPhoneNumber("+254");
-    } else {
-      setPhoneNumber(text);
-    }
-  };
+  // const handlephonenumberChange = (text) => {
+  //   if (!text.startsWith("")) {
+  //     setphonenumber("");
+  //   } else {
+  //     setphonenumber(text);
+  //   }
+  // };
 
   const validateForm = () => {
     let newErrors = {};
-    if (fullNames.length === 0) {
-      newErrors.fullNames = 'Please provide your Full Names';
-    }
-    if (idNo.length === 0) {
-      newErrors.idNo = 'Please provide ID number';
+    if (username.length === 0) {
+      newErrors.username = 'Please provide your Full Names';
     }
     if (email.length === 0) {
       newErrors.email = 'Please provide Email';
     } else if (!email.endsWith('@gmail.com')) {
       newErrors.email = 'Email must be a Gmail Address';
-    }
-    if (password.length === 0) {
-      newErrors.password = 'Please Provide Password';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     if (confirmPassword.length === 0) {
       newErrors.confirmPassword = 'Please confirm your password';
@@ -120,19 +99,59 @@ export default function App({ navigation }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegistrationInput = () => {
+  const handleRegistrationInput = async () => {
     setLoading(true);
     if (!validateForm()) {
       setTimeout(() => {
         setLoading(false);
-        setFullNames('');
+      }, 2000);
+      return;
+    }
+    try {
+      const response = await fetch('http://127.0.0.1:8000/accounts/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          idNo,
+          email,
+          phonenumber,
+          password,
+        }),
+      });
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      console.log('Response URL:', response.url);
+      if (!response.ok) {
+        Alert.alert('Registration failed', 'Please check your input and try again.');
+        const errorData = await response.json();
+        console.error('Error response data:', errorData);
+        throw new Error(errorData.message || 'Registration failed');
+      }
+      console.log('Response received successfully');
+      console.log('Response body:', response);
+      
+      
+
+      
+      const data = await response.json();
+      if (data.success) {
+        setShowSuccess(true);
+        setusername('');
         setIdNo('');
         setEmail('');
+        setphonenumber('+254');
         setPassword('');
         setConfirmPassword('');
-        setShowSuccess(true);
-      }, 2000);
-    } else {
+      } else {
+        Alert.alert('Registration failed', data.message || 'Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      Alert.alert('Registration error', error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -141,7 +160,6 @@ export default function App({ navigation }) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
-        
       </View>
     );
   }
@@ -154,88 +172,57 @@ export default function App({ navigation }) {
       </View>
     );
   }
-  else{
 
   return (
     <View style={styles.container}>
-      <Modal
-        visible={showPrompt}
-        transparent={true}
-        onRequestClose={() => setShowPrompt(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.promptContainer}>
-            <Text style={styles.textPrompt}>Please provide Phone Number to Continue</Text>
-            <TextInput
-              style={styles.inputPrompt}
-              value={phoneNumber}
-              onChangeText={handlePhoneNumberChange}
-              keyboardType="numeric"
-            />
-            {errors.phoneNumber && <Text style={styles.textError}>❗{errors.phoneNumber}</Text>}
-            <TouchableOpacity style={styles.button} onPress={handleVerify}>
-              <Text style={styles.buttonText}>Verify</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <View style={styles.inputContainer}>
+        <Text style={styles.textInput}>Username:</Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          onChangeText={setusername}
+        />
+        {errors.username && <Text style={styles.textError}>{errors.username}</Text>}
 
-      {!showPrompt && (
-        <View style={styles.inputContainer}>
-          <Text style={styles.textInput}>Full Names:</Text>
-          <TextInput
-            style={styles.input}
-            value={fullNames}
-            onChangeText={setFullNames}
-          />
-          {errors.fullNames && <Text style={styles.textError}>{errors.fullNames}</Text>}
 
-          <Text style={styles.textInput}>ID Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={idNo}
-            onChangeText={setIdNo}
-            keyboardType='numeric'
-          />
-          {errors.idNo && <Text style={styles.textError}>{errors.idNo}</Text>}
+        <Text style={styles.textInput}>Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          onChangeText={setEmail}
+          textContentType="emailAddress"
+          autoComplete="email"
+        />
+        {errors.email && <Text style={styles.textError}>{errors.email}</Text>}
 
-          <Text style={styles.textInput}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            textContentType="emailAddress"
-            keyboardType="email-address"
-          />
-          {errors.email && <Text style={styles.textError}>{errors.email}</Text>}
+        <Text style={styles.textInput}>Phone Number:</Text>
+        <TextInput
+          style={styles.input}
+          value={phonenumber}
+          onChangeText={setphonenumber}
+          keyboardType="numeric"
+        />
+        {errors.phonenumber && <Text style={styles.textError}>{errors.phonenumber}</Text>}
 
-          <Text style={styles.textInput}>Password:</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-          />
-          {errors.password && <Text style={styles.textError}>{errors.password}</Text>}
+        <Text style={styles.textInput}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+        />
+        {errors.password && <Text style={styles.textError}>{errors.password}</Text>}
 
-          <Text style={styles.textInput}>Confirm Password:</Text>
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-          {errors.confirmPassword && <Text style={styles.textError}>{errors.confirmPassword}</Text>}
-
-          {loading ? (
-            <ActivityIndicator size="large" color="orange" />
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={handleRegistrationInput}>
-              <Text style={styles.buttonText}>Sign up</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+        {loading ? (
+          <ActivityIndicator size="large" color="orange" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleRegistrationInput}>
+            <Text style={styles.buttonText}>Sign up</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       <Modal
         visible={showSuccess}
@@ -251,7 +238,7 @@ export default function App({ navigation }) {
     </View>
   );
 }
-}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -302,14 +289,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  promptContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-    elevation: 5,
-  },
   successContainer: {
     width: '80%',
     backgroundColor: 'green',
@@ -318,26 +297,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 5,
   },
-  textPrompt: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: 'gray',
-  },
   successText: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     color: 'white',
     marginBottom: 10,
-  },
-  inputPrompt: {
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'gray',
-    margin: 15,
-    width: '100%',
-    padding: 10,
   },
   textError: {
     color: 'red',
